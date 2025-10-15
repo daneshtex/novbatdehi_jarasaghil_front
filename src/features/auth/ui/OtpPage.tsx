@@ -7,6 +7,7 @@ import Button from '../../../shared/ui/Button';
 import FormError from '../../../shared/ui/FormError';
 import { useAppDispatch } from '../../../store/hooks';
 import { setSession } from '../../../store/slices/sessionSlice';
+import { APP_NAME } from '../../../shared/config/app';
 
 type LocationState = { mobile?: string };
 
@@ -73,12 +74,13 @@ export default function OtpPage() {
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-4 shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">تایید کد</h1>
+            <h1 className="text-4xl font-bold text-white mb-2">{APP_NAME}</h1>
+            <h2 className="text-xl font-semibold text-white/90 mb-2">تایید کد</h2>
             <p className="text-gray-300">کد ارسال شده به {mobile}</p>
           </div>
 
@@ -108,14 +110,14 @@ export default function OtpPage() {
             <Button
               type="submit"
               loading={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
+              className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-transparent"
             >
               تایید
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <button onClick={handleResend} className="text-blue-400 hover:text-cyan-300 font-medium transition-colors duration-200">
+            <button onClick={handleResend} className="text-orange-400 hover:text-orange-300 font-medium transition-colors duration-200">
               ارسال مجدد کد
             </button>
           </div>

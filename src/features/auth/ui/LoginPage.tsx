@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '../../../shared/api/http';
-import { sendCode } from '../api';
+import { sendCode, loginWithPassword } from '../api';
 import { useAppDispatch } from '../../../store/hooks';
 import { setSession } from '../../../store/slices/sessionSlice';
 import Button from '../../../shared/ui/Button';
 import FormError from '../../../shared/ui/FormError';
 import { normalizeIranMobile } from '../../../shared/lib/phone';
 import { useMutation } from '@tanstack/react-query';
+import { APP_NAME } from '../../../shared/config/app';
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const [mobile, setMobile] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginMode, setLoginMode] = useState<'otp' | 'password'>('password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,6 +22,19 @@ export default function LoginPage() {
   const sendCodeMutation = useMutation({
     mutationFn: (m: string) => sendCode(m),
   });
+
+  const passwordLoginMutation = useMutation({
+    mutationFn: ({ mobile, password }: { mobile: string; password: string }) => 
+      loginWithPassword(mobile, password),
+  });
+
+  const handleModeChange = (mode: 'otp' | 'password') => {
+    setLoginMode(mode);
+    setError(null);
+    if (mode === 'otp') {
+      setPassword(''); // Clear password when switching to OTP mode
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +44,7 @@ export default function LoginPage() {
 
     if (import.meta.env?.MODE !== 'production') {
       // eslint-disable-next-line no-console
-      console.log('[Login Submit] rawMobile:', mobile, 'normalized:', normalized);
+      console.log(`[${APP_NAME} Login Submit] rawMobile:`, mobile, 'normalized:', normalized, 'mode:', loginMode);
     }
 
     if (!/^0?9\d{9}$/.test(normalized)) {
@@ -36,26 +52,53 @@ export default function LoginPage() {
       return;
     }
 
+    if (loginMode === 'password' && !password.trim()) {
+      setError('رمز عبور را وارد کنید');
+      return;
+    }
+
     try {
       setLoading(true);
-      if (import.meta.env?.MODE !== 'production') {
-        // eslint-disable-next-line no-console
-        console.log('[Login Request] payload:', { mobile: normalized });
+      
+      if (loginMode === 'otp') {
+        if (import.meta.env?.MODE !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log(`[${APP_NAME} OTP Login Request] payload:`, { mobile: normalized });
+        }
+        await sendCodeMutation.mutateAsync(normalized);
+        dispatch(setSession({ token: null, mobile: normalized }));
+        navigate('/auth/otp', { state: { mobile: normalized } });
+      } else {
+        if (import.meta.env?.MODE !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log(`[${APP_NAME} Password Login Request] payload:`, { mobile: normalized, password });
+        }
+        const result = await passwordLoginMutation.mutateAsync({ mobile: normalized, password });
+        
+        if (result?.token) {
+          dispatch(setSession({ token: result.token, mobile: normalized }));
+          navigate('/dashboard');
+        } else if (result?.need_signup) {
+          navigate('/auth/signup', { state: { mobile: normalized } });
+        } else {
+          setError('ورود ناموفق. لطفاً اطلاعات را بررسی کنید');
+        }
       }
-      await sendCodeMutation.mutateAsync(normalized);
-      dispatch(setSession({ token: null, mobile: normalized }));
-      navigate('/auth/otp', { state: { mobile: normalized } });
     } catch (err: any) {
       if (import.meta.env?.MODE !== 'production') {
         // eslint-disable-next-line no-console
-        console.error('[Login Error]', err);
+        console.error(`[${APP_NAME} Login Error]`, err);
       }
-      const status = err?.response?.status;
-      const redirect = err?.response?.data?.data?.redirect;
-      if (status === 402 && redirect === 'otp') {
-        navigate('/auth/otp', { state: { mobile: normalized } });
-        return;
+      
+      if (loginMode === 'otp') {
+        const status = err?.response?.status;
+        const redirect = err?.response?.data?.data?.redirect;
+        if (status === 402 && redirect === 'otp') {
+          navigate('/auth/otp', { state: { mobile: normalized } });
+          return;
+        }
       }
+      
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
@@ -72,13 +115,44 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-4 shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">ورود به سیستم</h1>
-            <p className="text-gray-300">شماره موبایل خود را وارد کنید</p>
+            <h1 className="text-4xl font-bold text-white mb-2">{APP_NAME}</h1>
+            <h2 className="text-xl font-semibold text-white/90 mb-2">ورود به سیستم</h2>
+            <p className="text-gray-300">
+              {loginMode === 'otp' ? 'شماره موبایل خود را وارد کنید' : 'شماره موبایل و رمز عبور خود را وارد کنید'}
+            </p>
+          </div>
+
+          {/* Login Mode Toggle */}
+          <div className="mb-6">
+            <div className="flex bg-white/10 rounded-xl p-1">
+              <button
+                type="button"
+                onClick={() => handleModeChange('otp')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  loginMode === 'otp'
+                    ? 'bg-white/20 text-white shadow-sm'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                ورود با کد تایید
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('password')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  loginMode === 'password'
+                    ? 'bg-white/20 text-white shadow-sm'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                ورود با رمز عبور
+              </button>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,14 +179,42 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Password Field - Only show in password mode */}
+            {loginMode === 'password' && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
+                  رمز عبور
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="رمز عبور خود را وارد کنید"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-4 pr-10 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                  />
+                </div>
+              </div>
+            )}
+
             <FormError message={error} />
 
             <Button 
               type="submit" 
               loading={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
+              className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-transparent"
             >
-              {loading ? 'در حال ارسال...' : 'ارسال کد تایید'}
+              {loading 
+                ? 'در حال ورود...' 
+                : loginMode === 'otp' 
+                  ? 'ارسال کد تایید' 
+                  : 'ورود به سیستم'
+              }
             </Button>
           </form>
 
@@ -135,7 +237,10 @@ export default function LoginPage() {
               </svg>
             </div>
             <p className="text-sm text-gray-300">
-              کد تایید به شماره موبایل شما ارسال خواهد شد
+              {loginMode === 'otp' 
+                ? 'کد تایید به شماره موبایل شما ارسال خواهد شد'
+                : 'اطلاعات ورود شما امن نگهداری می‌شود'
+              }
             </p>
           </div>
         </div>

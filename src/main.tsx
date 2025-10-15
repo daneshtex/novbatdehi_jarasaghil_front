@@ -5,6 +5,10 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 import './index.css'
 import App from './App.tsx'
+import { APP_NAME } from './shared/config/app'
+
+// Update document title
+document.title = APP_NAME
 
 const queryClient = new QueryClient()
 

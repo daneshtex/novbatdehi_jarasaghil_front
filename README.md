@@ -1,4 +1,4 @@
-# Kamiona Frontend
+# Mamadgram Frontend
 
 Modern React app with a clean, feature-first architecture. Built with Vite, React 19, TypeScript, Tailwind CSS 4, React Query, and Redux Toolkit.
 

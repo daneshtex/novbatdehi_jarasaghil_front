@@ -8,6 +8,7 @@ import FormError from '../../../shared/ui/FormError';
 import { normalizeIranMobile } from '../../../shared/lib/phone';
 import { useAppDispatch } from '../../../store/hooks';
 import { setSession } from '../../../store/slices/sessionSlice';
+import { APP_NAME } from '../../../shared/config/app';
 
 export default function MobilePage() {
   const dispatch = useAppDispatch();
@@ -40,7 +41,11 @@ export default function MobilePage() {
 
   return (
     <div className="mt-16">
-      <h1 className="text-2xl font-bold mb-6 text-center">ورود با شماره موبایل</h1>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{APP_NAME}</h1>
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">ورود با شماره موبایل</h2>
+        <p className="text-gray-600">شماره موبایل خود را وارد کنید</p>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <TextInput
           label="شماره موبایل"
@@ -52,7 +57,7 @@ export default function MobilePage() {
           onChange={(e) => setMobile(e.target.value)}
         />
         <FormError message={error} />
-        <Button type="submit" loading={loading}>ارسال کد تایید</Button>
+        <Button type="submit" loading={loading} className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">ارسال کد تایید</Button>
       </form>
     </div>
   );

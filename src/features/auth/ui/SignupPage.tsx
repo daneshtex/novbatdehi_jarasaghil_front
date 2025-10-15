@@ -5,6 +5,7 @@ import { getErrorMessage } from '../../../shared/api/http';
 import TextInput from '../../../shared/ui/TextInput';
 import Button from '../../../shared/ui/Button';
 import FormError from '../../../shared/ui/FormError';
+import { APP_NAME } from '../../../shared/config/app';
 
 type LocationState = {
   mobile?: string;
@@ -40,7 +41,11 @@ export default function SignupPage() {
 
   return (
     <div className="mt-16">
-      <h1 className="text-2xl font-bold mb-6 text-center">تکمیل ثبت‌نام</h1>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{APP_NAME}</h1>
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">تکمیل ثبت‌نام</h2>
+        <p className="text-gray-600">اطلاعات خود را تکمیل کنید</p>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <TextInput
           label="نام"
@@ -56,7 +61,7 @@ export default function SignupPage() {
           />
         </div>
         <FormError message={error} />
-        <Button type="submit" loading={loading} className="bg-green-600">ثبت‌نام</Button>
+        <Button type="submit" loading={loading} className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">ثبت‌نام</Button>
       </form>
     </div>
   );
