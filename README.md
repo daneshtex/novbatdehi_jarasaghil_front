@@ -49,6 +49,7 @@ src/
 ```
 
 Key principles:
+
 - Organize by feature, not by file type.
 - Separate concerns: UI (React) vs. data (http/api) vs. domain (types/logic).
 - Reuse primitives from `shared/ui` and utilities from `shared/lib`.
@@ -57,27 +58,33 @@ Key principles:
 ## Implemented Changes
 
 - Shared config and HTTP gateway
+
   - `shared/config/env.ts`: single source of truth for `VITE_API_BASE_URL` and mode
   - `shared/api/http.ts`: `httpJson`, `getErrorInfo`, `getErrorMessage`
 
 - Auth feature
+
   - `features/auth/api.ts`: `sendCode`, `verifyCode`, `signup`
   - `features/auth/RequireAuth.tsx`: guard for protected routes
   - `features/auth/ui/*`: Login, Mobile, Otp, Signup pages
   - `features/auth/routes.tsx`: route objects for auth paths
 
 - Dashboard feature
+
   - `features/dashboard/ui/*`: `DashboardLayout` + overview/users/orders pages
   - `features/dashboard/routes.tsx`: protected dashboard route tree
 
 - State management
+
   - `store/slices/sessionSlice.ts`: token/mobile session state
   - `store/slices/uiSlice.ts`: theme and global message
 
 - Routing
+
   - `App.tsx`: lazy-loads and composes routes from features
 
 - UI primitives and utilities
+
   - Moved to `shared/ui` and `shared/lib` and updated all imports
 
 - Cleanup
@@ -85,7 +92,7 @@ Key principles:
 
 ## Environment
 
-- `VITE_API_BASE_URL` — e.g. `http://localhost:8000/api/v1/admin`
+- `VITE_API_BASE_URL` — e.g. `http://localhost:8000/api`
 - Fallback base URL is present for development convenience.
 
 ## Development
@@ -115,4 +122,3 @@ npm run preview
 - Persist session (e.g., localStorage or cookies) and implement logout.
 - Add `features/*/model` and `features/*/hooks` for richer domain boundaries.
 - Centralize query keys and add MSW for API testing.
-
