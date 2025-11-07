@@ -1,16 +1,19 @@
-import { lazy } from 'react';
-import type { RouteObject } from 'react-router-dom';
+import { lazy } from "react";
+import type { RouteObject } from "react-router-dom";
 
-const LoginPage = lazy(() => import('./ui/LoginPage'));
-const MobilePage = lazy(() => import('./ui/MobilePage'));
-const OtpPage = lazy(() => import('./ui/OtpPage'));
-const SignupPage = lazy(() => import('./ui/SignupPage'));
+const LoginPageDriver = lazy(() => import("./ui/LoginPageDriver"));
+const LoginPageOwner = lazy(() => import("./ui/LoginPageOwner"));
+const LoginPageAdmin = lazy(() => import("./ui/LoginPageAdmin"));
+const MobilePage = lazy(() => import("./ui/MobilePage"));
+const OtpPage = lazy(() => import("./ui/OtpPage"));
+const SignupPage = lazy(() => import("./ui/SignupPage"));
 
 export const authRoutes: RouteObject[] = [
-  { path: '/', element: <LoginPage /> },
-  { path: '/auth/phone', element: <MobilePage /> },
-  { path: '/auth/otp', element: <OtpPage /> },
-  { path: '/auth/signup', element: <SignupPage /> },
+  { path: "/owner", element: <LoginPageOwner /> },
+  { path: "/panel/admin", element: <LoginPageAdmin /> },
+  { path: "/driver", element: <LoginPageDriver /> },
+
+  { path: "/auth/phone", element: <MobilePage /> },
+  { path: "/auth/otp", element: <OtpPage /> },
+  { path: "/auth/signup", element: <SignupPage /> },
 ];
-
-

@@ -3,9 +3,9 @@
  */
 
 export const APP_CONFIG = {
-  name: 'کامیونا',
-  version: '1.0.0',
-  description: 'Modern React app with authentication and dashboard features',
+  name: "رزرو نوبت",
+  version: "1.0.0",
+  description: "Modern React app with authentication and dashboard features",
 } as const;
 
 export const APP_NAME = APP_CONFIG.name;

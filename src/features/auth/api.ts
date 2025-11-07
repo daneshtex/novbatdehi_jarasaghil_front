@@ -1,47 +1,61 @@
-import { httpJson } from '../../shared/api/http';
+import { httpJson } from "../../shared/api/http";
 
 export async function sendCode(mobile: string): Promise<void> {
-  await httpJson<void>('/reSendCode', {
-    method: 'POST',
+  await httpJson<void>("/resend-otp", {
+    method: "POST",
     body: JSON.stringify({ mobile }),
   });
 }
 
-export async function verifyCode(mobile: string, otp: string): Promise<{ token?: string; need_signup?: boolean } | void> {
-  return await httpJson<{ token?: string; need_signup?: boolean } | void>('/login', {
-    method: 'POST',
-    body: JSON.stringify({ mobile, otp }),
-  });
+export async function verifyCode(
+  mobile: string,
+  otp: string
+): Promise<{ token?: string; need_signup?: boolean } | void> {
+  return await httpJson<{ token?: string; need_signup?: boolean } | void>(
+    "/login",
+    {
+      method: "POST",
+      body: JSON.stringify({ mobile, otp }),
+    }
+  );
 }
 
-export async function loginWithPassword(mobile: string, password: string): Promise<{ token?: string; need_signup?: boolean } | void> {
-  const response = await httpJson<{ 
-    code: number; 
-    message: string; 
-    data: { 
-      access_token: string; 
-      message: string; 
-    } 
-  }>('/login', {
-    method: 'POST',
+export async function loginWithPassword(
+  mobile: string,
+  password: string
+): Promise<{ token?: string; need_signup?: boolean } | void> {
+  const response = await httpJson<{
+    data: {
+      token: string; // 👈 اینجا "token" است نه "access_token"
+      user: any;
+    };
+    message: string;
+  }>("/login", {
+    method: "POST",
     body: JSON.stringify({ mobile, password }),
   });
-  
-  // Transform the response to match expected format
-  if (response.code === 200 && response.data?.access_token) {
-    return { token: response.data.access_token };
+
+  console.log("🔍 [loginWithPassword] Full backend response:", response);
+  console.log(
+    "🔍 [loginWithPassword] Token from backend:",
+    response?.data?.token
+  );
+
+  // اصلاح شرط برای تطبیق با ساختار واقعی response
+  if (response?.data?.token) {
+    console.log("✅ [loginWithPassword] Login successful, token found");
+    return { token: response.data.token };
   }
-  
+
+  console.log("❌ [loginWithPassword] No token found in response");
   return undefined;
 }
 
 export type SignupInput = { mobile: string; name: string; password: string };
 
 export async function signup(input: SignupInput): Promise<void> {
-  await httpJson<void>('/signup', {
-    method: 'POST',
+  await httpJson<void>("/signup", {
+    method: "POST",
     body: JSON.stringify(input),
   });
 }
-
-
