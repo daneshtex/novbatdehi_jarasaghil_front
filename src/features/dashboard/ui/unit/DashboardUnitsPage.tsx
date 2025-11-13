@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import DataTable, { type Column } from "../../../../shared/ui/DataTable";
-import { useCarsData, type Car } from "../../hooks/useCarsData";
+import { useModelData, type Car } from "../../hooks/useUnitsData";
 import { useNavigate } from "react-router-dom";
 import { httpTokenJson } from "../../../../shared/api/http";
 import toast from "react-hot-toast";
 
 export default function DashboardCarsPage() {
-  const { cars, refetch } = useCarsData();
+  const { cars, refetch } = useModelData();
   const navigate = useNavigate();
 
   const [selectedData, setSelectedData] = useState<Car | null>(null);
@@ -16,7 +16,7 @@ export default function DashboardCarsPage() {
   async function handleDeleteCar() {
     if (!selectedData) return;
     try {
-      await httpTokenJson(`/car/${selectedData.id}`, { method: "DELETE" });
+      await httpTokenJson(`/unit/${selectedData.id}`, { method: "DELETE" });
       toast.success(`انواع کانتینر "${selectedData.name}" با موفقیت حذف شد.`);
       closeModal();
       refetch?.();
@@ -34,9 +34,7 @@ export default function DashboardCarsPage() {
         method: "GET",
       });
       const newStatus = selectedData.status === "فعال" ? "غیرفعال" : "فعال";
-      toast.success(
-        `انواع کانتینر "${selectedData.name}" اکنون ${newStatus} است.`
-      );
+      toast.success(` واحد "${selectedData.name}" اکنون ${newStatus} است.`);
       closeModal();
       refetch?.();
     } catch (err) {
@@ -182,10 +180,10 @@ export default function DashboardCarsPage() {
         data={cars}
         columns={columns}
         searchable
-        searchPlaceholder="جستجو در ناوگان..."
+        searchPlaceholder="جستجو در واحد..."
         pagination
         pageSize={5}
-        emptyMessage="هیچ ناوگانی یافت نشد"
+        emptyMessage="هیچ واحد یافت نشد"
       />
 
       {/* Modal سفارشی */}

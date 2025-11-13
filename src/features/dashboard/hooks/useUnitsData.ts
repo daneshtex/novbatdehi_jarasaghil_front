@@ -6,9 +6,8 @@ export interface CarFormData {
   name: string;
 }
 // نوع داده‌ای که از API دریافت می‌کنید
-export interface ApiCar {
+export interface Api {
   id: number;
-
   name: string;
   status: boolean; // ✅ boolean
   created_at: string;
@@ -16,7 +15,7 @@ export interface ApiCar {
 }
 
 export interface ApiResponse {
-  data: ApiCar[];
+  data: Api[];
   message: string;
 }
 
@@ -27,16 +26,16 @@ export interface Car {
   status: "فعال" | "غیرفعال";
 }
 
-export function useCarsData() {
+export function useModelData() {
   const carsQuery = useQuery({
-    queryKey: ["cars"],
+    queryKey: ["units"],
     queryFn: async (): Promise<Car[]> => {
-      const response = await httpTokenIndexJson<ApiResponse>("/car");
+      const response = await httpTokenIndexJson<ApiResponse>("/unit");
 
-      return response.data.map((car) => ({
-        id: car.id,
-        name: car.name,
-        status: car.status ? "فعال" : "غیرفعال", // ✅ تبدیل
+      return response.data.map((res) => ({
+        id: res.id,
+        name: res.name,
+        status: res.status ? "فعال" : "غیرفعال", // ✅ تبدیل
       }));
     },
   });
@@ -66,6 +65,6 @@ function formatDate(dateString: string): string {
 
 // ✅ اضافه کنید: نوع پاسخ برای یک کاربر (تکی)
 export interface SingleCarApiResponse {
-  data: ApiCar;
+  data: Api;
   message: string;
 }

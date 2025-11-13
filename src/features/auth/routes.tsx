@@ -9,7 +9,7 @@ const OtpPage = lazy(() => import("./ui/OtpPage"));
 const SignupPage = lazy(() => import("./ui/SignupPage"));
 
 export const authRoutes: RouteObject[] = [
-  { path: "/owner", element: <LoginPageOwner /> },
+  { path: "/", element: <LoginPageOwner /> },
   { path: "/panel/admin", element: <LoginPageAdmin /> },
   { path: "/driver", element: <LoginPageDriver /> },
 

@@ -125,12 +125,17 @@ export async function httpTokenJson<T>(
   // const baseUrl =
   //   init?.baseUrlOverride || (import.meta.env.DEV ? "" : getBaseUrl());
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+
   console.log("🚀 [API Request] Full URL:", url);
 
   // دریافت token از localStorage یا session
   const token =
     localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
-
+  console.log(
+    "token",
+    localStorage.getItem("auth_token"),
+    sessionStorage.getItem("auth_token")
+  );
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -148,7 +153,7 @@ export async function httpTokenJson<T>(
     headers,
     ...init,
   });
-
+  console.log("res", res);
   console.log("🔍 [API Response] Status:", res.status, res.statusText);
 
   if (!res.ok) {
@@ -187,3 +192,54 @@ export async function httpTokenJson<T>(
 }
 
 // http.ts
+
+export async function httpTokenIndexJson<T>(
+  path: string,
+  init?: RequestInit & { baseUrlOverride?: string }
+): Promise<T> {
+  const baseUrl = "http://192.168.43.100:8000/api";
+
+  // اطمینان از حفظ /api در مسیر
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${baseUrl}${cleanPath}${
+    cleanPath.includes("?") ? "&" : "?"
+  }limit=-1`;
+
+  console.log("🚀 [API Request] Full URL:", url);
+
+  // دریافت token
+  const token =
+    localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    ...((init?.headers as Record<string, string>) || {}),
+  };
+
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  console.log("🔍 [API Headers]:", headers);
+
+  const res = await fetch(url, { headers, ...init });
+  console.log("🔍 [API Response] Status:", res.status, res.statusText);
+
+  if (!res.ok) {
+    let errorData;
+    try {
+      errorData = await res.text();
+      try {
+        errorData = JSON.parse(errorData);
+      } catch {}
+    } catch {
+      errorData = "Cannot read error response";
+    }
+
+    const error: any = new Error(`HTTP Error: ${res.status} ${res.statusText}`);
+    error.response = { status: res.status, data: errorData };
+    throw error;
+  }
+
+  const text = await res.text();
+  return text ? (JSON.parse(text) as T) : (null as T);
+}

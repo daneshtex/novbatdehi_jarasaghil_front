@@ -3,7 +3,7 @@
  */
 
 export const APP_CONFIG = {
-  name: "رزرو نوبت",
+  name: " رزو نوبت جرثقیل ",
   version: "1.0.0",
   description: "Modern React app with authentication and dashboard features",
 } as const;

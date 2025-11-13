@@ -11,7 +11,7 @@ type SidebarItem = {
   icon?: ReactNode;
   permission?: string;
 };
-
+console.log("AuthContext", useAuth);
 const items: SidebarItem[] = [
   {
     label: "نمای کلی",
@@ -53,7 +53,7 @@ const items: SidebarItem[] = [
     permission: "user.all",
   },
   {
-    label: "جرثقیل و لیفتراک",
+    label: "انواع کانتینر",
     to: "/dashboard/cars",
     icon: (
       <svg

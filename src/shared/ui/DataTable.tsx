@@ -223,7 +223,9 @@ export default function DataTable<T extends Record<string, any>>({
                   >
                     <span className="hidden sm:inline">{column.title}</span>
                     <span className="sm:hidden">
-                      {column.title.length > 8 ? column.title.substring(0, 8) + "..." : column.title}
+                      {column.title.length > 8
+                        ? column.title.substring(0, 8) + "..."
+                        : column.title}
                     </span>
                   </th>
                 ))}
@@ -299,7 +301,7 @@ export default function DataTable<T extends Record<string, any>>({
                 قبلی
               </button>
 
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              {Array.from({ length: Math.min(15, totalPages) }, (_, i) => {
                 const pageNum = i + 1;
                 return (
                   <button

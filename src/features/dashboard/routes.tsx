@@ -31,6 +31,7 @@ export const dashboardRoutes: RouteObject[] = [
       { path: "cars", element: <DashboardCarsPage /> },
       { path: "cars/add", element: <AddCarPage /> },
       { path: "cars/:id", element: <ViewEditCarPage /> },
+
       { path: "orders", element: <DashboardOrdersPage /> },
     ],
   },

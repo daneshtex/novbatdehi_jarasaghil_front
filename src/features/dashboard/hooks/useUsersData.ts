@@ -1,6 +1,6 @@
 // src/features/dashboard/hooks/useUsersData.ts
 import { useQuery } from "@tanstack/react-query";
-import { httpTokenJson } from "../../../shared/api/http";
+import { httpTokenIndexJson } from "../../../shared/api/http";
 
 export interface UserFormData {
   name: string;
@@ -51,7 +51,7 @@ export function useUsersData() {
   const usersQuery = useQuery({
     queryKey: ["users"],
     queryFn: async (): Promise<User[]> => {
-      const response = await httpTokenJson<ApiResponse>("/user");
+      const response = await httpTokenIndexJson<ApiResponse>("/user");
 
       return response.data.map((user) => ({
         id: user.id,

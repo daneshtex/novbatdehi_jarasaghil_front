@@ -26,15 +26,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await httpTokenJson<{ user: any; permissions: string[] }>(
-          "/auth/me"
-        );
+        const res = await httpTokenJson<{
+          data: {
+            user: {
+              id: number;
+              name: string;
+              mobile: string;
+              roles: string[];
+              permissions: string[];
+            };
+          };
+          message: string;
+        }>("/auth/me");
         setUser({
-          id: res.user.id,
-          name: res.user.name,
-          mobile: res.user.mobile,
-          roles: res.user.roles || [],
-          permissions: res.permissions || [],
+          id: res.data.user.id,
+          name: res.data.user.name,
+          mobile: res.data.user.mobile,
+          roles: res.data.user.roles || [],
+          permissions: res.data.user.permissions || [],
         });
         console.log("permission", res);
       } catch {
